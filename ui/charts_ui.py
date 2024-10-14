@@ -1,0 +1,167 @@
+import flet as ft
+
+from data.bills import get_bills
+
+def charts_page(current_theme, page:ft.Page, BASE_URL:str, user_id:str):
+
+    colors = [
+    ft.colors.RED, ft.colors.BLUE, ft.colors.GREEN, ft.colors.YELLOW,
+    ft.colors.ORANGE, ft.colors.PINK, ft.colors.PURPLE, ft.colors.TEAL,
+    ft.colors.CYAN, ft.colors.INDIGO, ft.colors.LIME, ft.colors.AMBER,
+    ft.colors.BROWN, ft.colors.GREY, ft.colors.AMBER, ft.colors.LIGHT_BLUE,
+    ft.colors.LIGHT_GREEN, ft.colors.GREEN_300, ft.colors.TEAL_700, ft.colors.YELLOW_300
+
+    ]
+    
+    normal_radius = 100
+    hover_radius = 120
+    normal_title_style = ft.TextStyle(
+        size=0, color=ft.colors.WHITE, weight=ft.FontWeight.BOLD,
+    )
+    hover_title_style = ft.TextStyle(
+        size=22,
+        color=ft.colors.WHITE,
+        weight=ft.FontWeight.BOLD,
+        shadow=ft.BoxShadow(blur_radius=2, color=ft.colors.BLACK54),
+    )
+
+    pie_chart = ft.PieChart(
+            sections_space=0,
+            center_space_radius=40,
+            expand=True,
+        )
+    def on_chart_event(e: ft.PieChartEvent):
+        for idx, section in enumerate(pie_chart.sections):
+            if idx == e.section_index:
+                section.radius = hover_radius
+                section.title_style = hover_title_style
+            else:
+                section.radius = normal_radius
+                section.title_style = normal_title_style
+        pie_chart.update()
+
+    pie_chart.on_chart_event=on_chart_event
+
+    data = get_bills(page, user_id, BASE_URL)
+    if data['error'] is None or data['error'] == "":
+        profile_pic = data["profile_pic"]
+        user_pay_hours = data["user_pay_hours"]
+        my_bills = data["my_bills"]
+        unpaid_bills = data["unpaid_bills"]
+    
+
+        
+        max_y_graph = 0
+        fourty_hours_month = 0
+        avg_hours_month = 0
+        for p in user_pay_hours:
+            if "40 Hours:" in p.key:
+                fourty_hours_month = float(p.key.split('$')[1].replace(',', ''))*4
+                print(fourty_hours_month)
+            if "Average Pay:" in p.key:
+                avg_hours_month = float(p.key.split('$')[1].replace(',', ''))*4
+            print(p.key)
+            pay = float(p.key.split('$')[1].replace(',', ''))
+            if pay > max_y_graph:
+                max_y_graph = pay
+
+        chart = ft.BarChart(
+            border=ft.border.all(1, ft.colors.GREY_400),
+            left_axis=ft.ChartAxis(labels_size=40, title=ft.Text("Earnings"), title_size=40),
+            bottom_axis=ft.ChartAxis(labels_size=0, title=ft.Text("Bills"), title_size=40),
+            horizontal_grid_lines=ft.ChartGridLines(color=ft.colors.GREY_300, width=1, dash_pattern=[3, 3]),
+            tooltip_bgcolor=ft.colors.with_opacity(0.5, ft.colors.GREY_300),
+            max_y=max_y_graph,
+            interactive=True,
+            expand=True,
+            )
+        
+
+
+        earnings_dropdown = ft.Dropdown()
+        chosen_pay=ft.Text(f"{earnings_dropdown.value if earnings_dropdown.value else '0.00'}", size=18, color=current_theme['calc_theme']['text'])
+        def update_chosen_pay(e):
+            monthly_pay = float(e.split('$')[1].replace(',', ''))*4
+            chosen_pay.value = f"${monthly_pay:,.2f}"
+            page.update()
+
+        earnings_dropdown = ft.Dropdown(
+            width=300,
+            options=user_pay_hours,
+            label="Pay Options",
+            on_change=lambda e: update_chosen_pay(e.control.value),
+            color=current_theme["calc_theme"]["dropdown_text"],
+            bgcolor=current_theme["calc_theme"]["dropdown_background"],
+            border_color=current_theme["calc_theme"]["dropdown_border_color"],
+            icon_enabled_color=current_theme["calc_theme"]["dropdown_icon_color"],
+        )
+
+        total_bills = 0
+        total_bill_percentage = 0
+        for index, bill in enumerate(my_bills):
+            total_bills += float(bill['amount'].replace('$', ''))
+            chart.bar_groups.append(
+                ft.BarChartGroup(
+                    x=0,
+                    bar_rods=[
+                        ft.BarChartRod(
+                            from_y=0,
+                            to_y=float(bill['amount'].replace('$', '').replace(',', '')),
+                            width=10,
+                            color=colors[index],
+                            tooltip=bill['name'],
+                            border_radius=0,
+                        ),
+                    ],
+                ),
+            )
+            bill_percentage = round((float(bill['amount'].replace('$', '').replace(',', '')) / (fourty_hours_month)) * 100, 2)
+            total_bill_percentage += bill_percentage
+            print(total_bill_percentage)
+            pie_chart.sections.append(
+                ft.PieChartSection(
+                bill_percentage,
+                title=f"{bill['name']}\n${float(bill['amount'].replace('$', '').replace(',', '')):,.2f}",
+                title_style=normal_title_style,
+                color=colors[index],
+                radius=normal_radius,
+            ),
+            )
+
+        pie_chart.sections.append(
+                ft.PieChartSection(
+                100 - total_bill_percentage,
+                title=f"Left over\n${fourty_hours_month - total_bills:,.2f}",
+                title_style=normal_title_style,
+                color=ft.colors.ORANGE,
+                radius=normal_radius,
+            ),
+        )
+        print(total_bills)
+    else:
+        print(data['error'])
+        
+
+
+    
+    if profile_pic:
+        appbar = ft.AppBar(leading=ft.Row(controls=[ft.IconButton(icon=ft.icons.ARROW_BACK, icon_color=current_theme["top_appbar_colors"]["icon_color"], on_click=lambda _: page.go("/")),ft.Image(src=current_theme["top_appbar_colors"]["icon"], width=200, fit=ft.ImageFit.FIT_WIDTH)]), leading_width=200, bgcolor=current_theme["top_appbar_colors"]["background"], actions=[ft.Container(content=ft.Image(src=profile_pic, width=40, height=40), border_radius=50, margin=ft.margin.only(right=10))])
+    else:
+        appbar = ft.AppBar(leading=ft.Row(controls=[ft.IconButton(icon=ft.icons.ARROW_BACK, icon_color=current_theme["top_appbar_colors"]["icon_color"], on_click=lambda _: page.go("/")),ft.Image(src=current_theme["top_appbar_colors"]["icon"], width=200, fit=ft.ImageFit.FIT_WIDTH)]), leading_width=200, bgcolor=current_theme["top_appbar_colors"]["background"])
+       
+    return ft.View(
+        "/charts",
+                    [
+                        ft.Column(controls=[
+                            earnings_dropdown,
+                            chosen_pay,
+                            chart,
+                            pie_chart
+
+                            ],
+                            expand=True,
+                            horizontal_alignment="center",
+                            scroll=ft.ScrollMode.ADAPTIVE),
+                    ],
+                appbar=appbar
+                )
