@@ -16,14 +16,27 @@ BASE_URL = 'https://j-bills.com/'
 
 
 def main(page: ft.Page):
-    page.title = "j-bills"
-    if page.platform is not page.platform.ANDROID:
-        page.window.width = 400
+    
+    #page.title = "Checkbook Wizard"
+    #if page.platform is page.platform.WINDOWS or page.platform is page.platform.LINUX or page.platform is page.platform.MACOS:
+    #page.window.width = 400
+    
     #page.platform = ft.PagePlatform.ANDROID
 
     user_info = {}
     user_id = page.client_storage.get("burnison.me.user.id")
-    
+
+    '''progress_bar = ft.ProgressBar(width=190, right=0, bottom=10, bar_height=10,border_radius=5)
+    loader = ft.AlertDialog(
+        content=ft.Stack(
+            [
+                ft.Image(src="/loader-icon.png", width=300),
+                progress_bar
+            ],
+        ),
+        modal=True
+    )
+    #page.close(loader)'''
 
     def route_change(route):
         saved_theme = page.client_storage.get("burnison.me.current.theme")
@@ -44,7 +57,7 @@ def main(page: ft.Page):
         elif page.route == "/bills":
             bills_page(current_theme, page, BASE_URL, user_id)
         elif page.route == "/edit_bills":
-            page.views.append(edit_bills_page(current_theme, page, BASE_URL))
+            edit_bills_page(current_theme, page, BASE_URL, user_id)
         elif page.route == "/charts":
             page.views.append(charts_page(current_theme, page, BASE_URL, user_id))
         elif page.route == "/pay":
@@ -53,7 +66,7 @@ def main(page: ft.Page):
             page.views.append(settings_page(current_theme, page, BASE_URL))
         
         page.update()
-
+        
     def view_pop(view):
         
         page.views.pop()
@@ -68,5 +81,6 @@ def main(page: ft.Page):
         print(f'Welcome, user {user_id}')
         page.go(page.route)
 
+    
 
 ft.app(main)

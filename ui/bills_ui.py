@@ -336,7 +336,7 @@ def bills_page(current_theme, page:ft.Page, BASE_URL:str, user_id:str):
                     controls=[
                         ft.Container(
                             content=ft.Row(controls=[
-                                ft.Text(f"{week_date.strftime('%A, %B %d %Y')}", size=22, color=current_theme['list_item_colors']['title_color'], style=ft.TextStyle(weight=ft.FontWeight.BOLD)),
+                                ft.Text(f"{week_date.strftime('%A, %b %d %Y')}", size=22, color=current_theme['list_item_colors']['title_color'], style=ft.TextStyle(weight=ft.FontWeight.BOLD)),
                                         ft.Container(
                                             expand=True,),
                                         edit_button,save_button],
@@ -374,12 +374,12 @@ def bills_page(current_theme, page:ft.Page, BASE_URL:str, user_id:str):
         alignment="center",
     )
 
-    payments_button = ft.Column(
+    payments_button = ft.Row(
         controls=[ft.Image(src="/payments.png", width=25, height=25, color=current_theme["bottom_navigation_colors"]["icon"]),
                   ft.Text("Earnings", size=12, color=current_theme["bottom_navigation_colors"]["text"], style=ft.TextStyle(weight=ft.FontWeight.BOLD))],
         spacing=2,
         expand=True,
-        horizontal_alignment="center",
+        #horizontal_alignment="center",
         alignment="center",
     )
     
@@ -406,6 +406,7 @@ def bills_page(current_theme, page:ft.Page, BASE_URL:str, user_id:str):
     bottom_sheet = ft.Container(
         content=ft.Container(
             content=ft.ListView([
+                ft.ElevatedButton(content=payments_button, expand=True, on_click=lambda _: page.go("/pay"), bgcolor=current_theme['bottom_sheet']['button_color']),
                 ft.ElevatedButton("Setings", icon=ft.icons.SETTINGS, width=400, color=current_theme['bottom_sheet']['button_text_color'], expand=True, on_click=lambda _: page.go("/settings"), bgcolor=current_theme['bottom_sheet']['button_color']),
                 ft.ElevatedButton("Log Out", icon=ft.icons.LOGOUT, width=400, color=current_theme['bottom_sheet']['button_text_color'], expand=True, on_click=lambda _: page.go("/"), bgcolor=current_theme['bottom_sheet']['button_color']),
                 ],
@@ -458,13 +459,13 @@ def bills_page(current_theme, page:ft.Page, BASE_URL:str, user_id:str):
         content=ft.Row(
             controls=[
                 ft.Container(content=bill_list_button,expand=True, on_click=lambda _: bill_list.scroll_to(0)),
-                ft.Container(expand=True),
+                #ft.Container(expand=True),
                 ft.Container(content=charts_button,expand=True, on_click=lambda _: page.go("/charts")),
-                ft.Container(expand=True),
-                ft.Container(content=payments_button,expand=True, on_click=lambda _: page.go("/pay")),
-                ft.Container(expand=True),
+                #ft.Container(expand=True),
+                #ft.Container(content=payments_button,expand=True, on_click=lambda _: page.go("/pay")),
+                #ft.Container(expand=True),
                 ft.Container(content=edit_bills_button,expand=True, on_click=lambda _: page.go("/edit_bills")),
-                ft.Container(expand=True),
+                #ft.Container(expand=True),
                 ft.Container(content=menu_button,expand=True, on_click=lambda _: toggle_bottom_sheet(None)),
                 
             ]
