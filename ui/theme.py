@@ -1,10 +1,17 @@
 import flet as ft
 
+# checkbook wizard app icon background color - #607D8B
+# app icon robe color - #1F7B4A
+# app icon collar color - #C07D09
+# app icon collar 2nd color - #9A6B1F
+# app icon collar border color - #EADD53
+# app icon text color - #71b681
 # Define custom themes with specific container and text colors
 def green_theme():
     return {
         "background": "#85bb65",
         "text_color": "#000000",
+        "progress_bar_color": "#fed831",
         "list_item_colors": {
             "base": "#1b4a00",
             "inner_container": "#2F6D23",
@@ -23,7 +30,7 @@ def green_theme():
             "background": "#118c4f",
             "text": ft.colors.WHITE,
             "icon_color": ft.colors.WHITE,
-            "icon": "/header-colored.png"
+            "icon": "/header-yellow.png"
         },
         "bottom_navigation_colors": {
             "background": "#118c4f",
@@ -51,6 +58,7 @@ def dark_theme():
     return {
         "background": ft.colors.BLACK,
         "text_color": "#ffffff",
+        "progress_bar_color": "#fed831",
         "list_item_colors": {
             "base": "#262626",
             "inner_container": "#3A3A3A",
@@ -96,6 +104,7 @@ def light_theme():
     return {
         "background": ft.colors.WHITE,
         "text_color": "#000000",
+        "progress_bar_color": "#000000",
         "list_item_colors": {
             "base": "#BDBDBD",
             "inner_container": "#E0E0E0E0",
@@ -114,7 +123,7 @@ def light_theme():
             "background": "#E0E0E0",
             "text": ft.colors.BLACK,
             "icon_color": ft.colors.BLACK,
-            "icon": "/header-dark.png"
+            "icon": "/header-black.png"
         },
         "bottom_navigation_colors": {
             "background": "#E0E0E0",

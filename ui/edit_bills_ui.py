@@ -24,20 +24,22 @@ def edit_bills_page(current_theme, page:ft.Page, BASE_URL:str, user_id:str):
     def handle_dismissal(e):
         print(f"DatePicker dismissed")
 
+    def open_date_picker(e, date_picker: ft.DatePicker):
+        date_picker.pick_date()
+
     '''define controls here'''
+    date_picker = ft.DatePicker(first_date=datetime.datetime.now(),
+                                #last_date=datetime.datetime(year=2024, month=10, day=1),
+                                on_change=handle_change,
+                                on_dismiss=handle_dismissal,
+                                )
     name_text = ft.TextField(label="Company/Person/Name: ", bgcolor=current_theme["list_item_colors"]['base'], color=current_theme["text_color"], label_style=ft.TextStyle(color=current_theme["text_color"]))
     amount_due = ft.TextField(label="Amount Due: ", bgcolor=current_theme["list_item_colors"]['base'], color=current_theme["text_color"], label_style=ft.TextStyle(color=current_theme["text_color"]))
     website = ft.TextField(label="Website(optional): ", bgcolor=current_theme["list_item_colors"]['base'], color=current_theme["text_color"], label_style=ft.TextStyle(color=current_theme["text_color"]))
     phone_number = ft.TextField(label="Phone Number(optional): ", bgcolor=current_theme["list_item_colors"]['base'], color=current_theme["text_color"], label_style=ft.TextStyle(color=current_theme["text_color"]))
     email = ft.TextField(label="Email(optional): ", bgcolor=current_theme["list_item_colors"]['base'], color=current_theme["text_color"], label_style=ft.TextStyle(color=current_theme["text_color"]))
     due_date_picker = ft.ElevatedButton("Pick date",icon=ft.icons.CALENDAR_MONTH,
-                                        on_click=lambda e: page.open(
-                                            ft.DatePicker(first_date=datetime.datetime.now(),
-                                                          #last_date=datetime.datetime(year=2024, month=10, day=1),
-                                                          on_change=handle_change,
-                                                          on_dismiss=handle_dismissal,
-                                                          )
-                                                        ),
+                                        on_click=lambda e: open_date_picker(e, date_picker=date_picker),
                                                     bgcolor=current_theme["list_item_colors"]['base'], color=current_theme["text_color"]
                                                     )
     due_date_column = ft.Row(controls=[ft.Column(controls=[due_date_picker, date_text], expand=True)], expand=True, visible=False)
@@ -144,7 +146,7 @@ def edit_bills_page(current_theme, page:ft.Page, BASE_URL:str, user_id:str):
     else:
         appbar = ft.AppBar(leading=ft.Row(controls=[ft.IconButton(icon=ft.icons.ARROW_BACK, icon_color=current_theme["top_appbar_colors"]["icon_color"], on_click=lambda _: page.go("/")),ft.Image(src=current_theme["top_appbar_colors"]["icon"], width=200, fit=ft.ImageFit.FIT_WIDTH)]), leading_width=200, bgcolor=current_theme["top_appbar_colors"]["background"])
     
-    
+    page.overlay.append(date_picker)
     page.views.append(ft.View("/charts",
                               [ft.Stack(
                                   controls=[ft.Column(controls=[
@@ -154,7 +156,8 @@ def edit_bills_page(current_theme, page:ft.Page, BASE_URL:str, user_id:str):
                                         amount_due,
                                         website,
                                         phone_number,
-                                        email
+                                        email,
+                                        
                                       ],
                                       expand=True,
                                       horizontal_alignment="center",
