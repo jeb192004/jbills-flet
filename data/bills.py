@@ -51,6 +51,14 @@ def remove_unpaid_bills(page: Page, unpaid_bills, BASE_URL: str):
      response = httpx.post(f"{BASE_URL}remove_past_due", json={"past_due": unpaid_bills})
      print(response)
 
+def add_update_bills(page: Page, BASE_URL: str, data):
+     
+     response = httpx.post(f"{BASE_URL}data/add_bill", json=data)
+     if response.status_code == 200:
+          print(response)
+          return "success"
+     else:
+          return "error"
 
 def get_bills_object(data):
      try:

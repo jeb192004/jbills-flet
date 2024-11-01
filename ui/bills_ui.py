@@ -131,23 +131,25 @@ def bills_page(current_theme, page:ft.Page, BASE_URL:str, user_id:str):
                 margin=ft.margin.all(10),
                 )
             
-    def getWeekdayOfMonth(year, month, weekdayIndex, occurrence):
-        date = datetime.IsoCalendarDate(year=year, month=month+1)
-        date.date(1);
-        firstDay = date.day();
-
-        firstFullWeek = date.clone().add((weekdayIndex + 7 - firstDay) % 7, 'days')
-        desiredDate = firstFullWeek.clone().add(occurrence, 'days')
-        desiredDayOfMonth = desiredDate.clone().date()
-        print(f'first day: ${firstDay}', f'first full week: ${firstFullWeek}', f'desired date: ${desiredDate}', f'desired day of month: ${desiredDayOfMonth}')
-
-        return desiredDayOfMonth
+    def getWeekdayOfMonth(year, month, week_date, weekdayIndex, occurrence):
+        #print(weekdayIndex, occurrence)
+        firstDay = datetime(year=year, month=month, day=1)
+        # Adjust the first day of the month to treat Sunday as 0
+        first_day_adjusted = (firstDay.weekday() + 1) % 7
+        # Find the first occurrence of the given weekday in the month
+        days_to_add = (weekdayIndex - first_day_adjusted + 7) % 7
+        first_occurrence = firstDay + timedelta(days=days_to_add)
+        # Calculate the date of the specified occurrence
+        target_date = first_occurrence + timedelta(weeks=occurrence - 1)
+        
+        return target_date.day
 
     def build_bill_list(bills, week_date, past_due, isEditable):
         week_date = week_date.date()
         week_date2 = week_date + timedelta(days=6)
         day = week_date
         month = week_date.month
+        week = week_date.isocalendar().week
         year = week_date.year
         month2 = week_date2.month
         bill_list = []
@@ -161,7 +163,7 @@ def bills_page(current_theme, page:ft.Page, BASE_URL:str, user_id:str):
                 due = bill["due_date"]
             elif bill["frequency"] == "monthly" and past_due == False:
                 if  len(due) > 2:
-                    print(due)
+                    #print(due)
                     weekdayIndex = 0
                     occurrence = 0
                     if due.split('-')[1] == 'Sunday': weekdayIndex = 0 
@@ -177,8 +179,8 @@ def bills_page(current_theme, page:ft.Page, BASE_URL:str, user_id:str):
                     if due.split('-')[0] == 'Third': occurrence = 7 + 7; due_date_text = '3rd ' + due.split('-')[1] 
                     if due.split('-')[0] == 'Fourth': occurrence = 7 + 7 + 7; due_date_text = '4th ' + due.split('-')[1] 
 
-                    dayOfMonth = getWeekdayOfMonth(year, month, weekdayIndex, occurrence)
-                    print(dayOfMonth)
+                    
+                    dayOfMonth = getWeekdayOfMonth(year, month, week_date, weekdayIndex, occurrence)
                     due = dayOfMonth
             
             if bill["frequency"] == "single":
