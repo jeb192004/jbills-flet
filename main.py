@@ -11,15 +11,15 @@ from ui.edit_bills_ui import edit_bills_page
 from ui.theme import light_theme, dark_theme, green_theme
 from ui.charts_ui import charts_page
 
-BASE_URL = 'https://j-bills.com/'
+BASE_URL = 'https://checkbookwizard.com/'
 #BASE_URL = 'http://localhost:1338/'
 
 
 def main(page: ft.Page):
     
-    #page.title = "Checkbook Wizard"
+    page.title = "Checkbook Wizard"
     #if page.platform is page.platform.WINDOWS or page.platform is page.platform.LINUX or page.platform is page.platform.MACOS:
-    #page.window.width = 400
+    page.window.width = 400
     
     #page.platform = ft.PagePlatform.ANDROID
 
